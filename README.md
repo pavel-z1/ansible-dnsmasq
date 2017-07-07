@@ -40,7 +40,15 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - role: gorbyo.dnsmasq
+      vars:
+        local_dns:
+          - { domain: zone1.domain1, ip: "192.168.1.1" }
+          - { domain: zone2.domain2, ip: "192.168.2.1" }
+
+        local_hosts:
+          - { hostname: host1.zone1.domain1, ip: "192.168.1.1" }
+          - { hostname: host2.zone2.domain2, ip: "192.168.2.1" }
 
 License
 -------
