@@ -10,8 +10,9 @@ This role requires Ansible 2.2 or higher and platform requirements are listed in
 
 Role Variables
 --------------
+  ```
   # Network interface for apply
-  mgmt_iface: eth10
+  mgmt_iface: "{{ansible_default_ipv4.interface}}"
 
   # List of high level DNS servers (require)
   root_dns:
@@ -26,7 +27,7 @@ Role Variables
   local_hosts:
     - { hostname: host1.zone1.domain1, ip: "192.168.1.1" }
     - { hostname: host2.zone2.domain2, ip: "192.168.2.1" }
-
+  ```
 Dependencies
 ------------
 
