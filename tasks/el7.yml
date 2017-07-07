@@ -1,0 +1,65 @@
+---
+- name:          install needed common packages
+  yum:
+    name:        '{{ item }}'
+    state:       installed
+  with_items:
+    - yum-utils
+
+- name:          install dnsmasq with package manager
+  package:
+    name:        dnsmasq
+    state:       present
+
+- name:          check network manager is installed
+  yum:
+    list:        NetworkManager
+  register:      nm_result
+
+- name:          define temp var
+  set_fact:      nm_ver={{item.version}}
+  when:          item.yumstate == 'installed'
+  with_items:    "{{nm_result.results}}"
+
+- block:
+    - name:      end play if nm old
+      fail:
+        msg:     "Please update system! NetworkManager is very old."
+    - meta:      end_play
+  when:          (nm_ver < '1.4.0') or (nm_ver is undefined)
+
+- name:          check resolv.conf
+  shell:         grep -q '127.0.0.1' /etc/resolv.conf
+  register:      localhost_dns
+  ignore_errors: True
+  changed_when:  False
+
+- name:          start service
+  service:
+    name:        dnsmasq
+    state:       started
+    enabled:     yes
+
+- name:          copy config dnsmasq
+  template:      src=local.conf.j2 dest=/etc/dnsmasq.d/local.conf
+  notify:        restart dnsmasq
+
+- block:
+  - name:        get iface UUID
+    shell:       nmcli -f UUID,DEVICE connection show|grep {{ mgmt_iface }} |awk '{print $1}'
+    register:    mgmt_uuid
+
+  - name:        check ipv4 settings
+    shell:       nmcli  connection show {{ mgmt_uuid.stdout }} | grep 'ipv4.method:' |awk '{print $2}'
+    register:    ipv4_method
+
+  - name:        dhcp method
+    shell:       echo {{ipv4_method.stdout}}
+    notify:      add dns-options
+    when:        ipv4_method.stdout == 'auto'
+
+  - name:        manual method
+    shell:       echo {{ipv4_method.stdout}}
+    notify:      add nameserver
+    when:        ipv4_method.stdout == 'manual'
+  when:          (localhost_dns|failed) and (nm_ver >= '1.4.0')

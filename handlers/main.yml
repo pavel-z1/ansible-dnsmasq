@@ -1,0 +1,26 @@
+---
+# handlers file for dnsmasq
+- name:       restart dnsmasq
+  service:    name=dnsmasq state=restarted
+
+- name:       copy config dhclient
+  copy:       src=dhclient.conf dest=/etc/dhcp
+  notify:     apply iface changes
+  listen:     add dns-options
+
+- name:       add nameserver
+  shell:      nmcli connection modify uuid {{ mgmt_uuid.stdout }} ipv4.dns 127.0.0.1
+  notify:     add root namservers
+
+- name:       add root namservers
+  shell:      nmcli connection modify uuid {{ mgmt_uuid.stdout }} +ipv4.dns {{ item }}
+  with_items: '{{ root_dns }}'
+  notify:     set dns-options
+
+- name:       set dns-options
+  shell:      nmcli connection modify uuid {{ mgmt_uuid.stdout }} +ipv4.dns-options "timeout:1"
+  notify:     apply iface changes
+  listen:     add dns-options
+
+- name:       apply iface changes
+  shell:      nmcli connection up uuid {{ mgmt_uuid.stdout }}

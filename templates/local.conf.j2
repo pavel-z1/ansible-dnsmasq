@@ -1,0 +1,37 @@
+# {{ ansible_managed }}
+
+interface=lo
+bind-interfaces
+bogus-priv
+no-poll
+
+all-servers
+#strict-order
+
+cache-size=2048
+neg-ttl=259200
+max-ttl=259200
+
+log-async=25
+log-queries
+log-facility=/var/log/dnsmasq.log
+
+
+# Main DNS
+{% for root_dns_ip in root_dns %}
+server={{root_dns_ip}}
+{% endfor %}
+
+# Local DNS
+{% if local_dns is defined %}
+{% for local_dns_param in local_dns %}
+server=/{{local_dns_param.domain}}/{{local_dns_param.ip}}
+{% endfor %}
+{% endif %}
+
+# Local Hosts
+{% if local_hosts is defined %}
+{% for local_hosts_param in local_hosts %}
+address=/{{local_hosts_param.hostname}}/{{local_hosts_param.ip}}
+{% endfor %}
+{% endif %}
