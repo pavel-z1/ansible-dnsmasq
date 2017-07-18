@@ -63,3 +63,6 @@
     notify:      add nameserver
     when:        ipv4_method.stdout == 'manual'
   when:          (localhost_dns|failed) and (nm_ver >= '1.4.0')
+
+- name:       copy config logrotate
+  copy:       src=dnsmasq.logrotate dest=/etc/logrotate.d/dnsmasq
