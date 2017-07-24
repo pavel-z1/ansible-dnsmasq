@@ -1,0 +1,31 @@
+---
+language: python
+sudo: required
+
+services:
+  - docker
+
+env:
+  - OS_VERSION=7
+
+before_install:
+  - sudo docker pull centos:${OS_VERSION}
+  - sudo docker build --rm=true --tag=travispoc .
+
+install:
+  - sudo docker run --detach --privileged --volume="${PWD}":/etc/ansible/roles/dnsmasq:ro --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro travispoc /usr/lib/systemd/systemd > /tmp/container_id
+  - sudo docker exec "$(cat /tmp/container_id)" yum -y install dnsmasq
+
+script:
+  # Check syntax of ansible playbook
+  - sudo docker exec "$(cat /tmp/container_id)" ansible-playbook /etc/ansible/roles/dnsmasq/tests/test.yml --syntax-check
+  # Run ansible playbook
+  - sudo docker exec "$(cat /tmp/container_id)" ansible-playbook /etc/ansible/roles/dnsmasq/tests/test.yml
+  # Make sure DnsMasq is running.
+  - sudo docker exec "$(cat /tmp/container_id)" dig centos.org @127.0.0.1 | grep -q 'ANSWER SECTION' && (echo 'Status - pass' && exit 0) || (echo 'Status - fail' && exit 1)
+
+after_script:
+  - sudo docker stop "$(cat /tmp/container_id)"
+
+#notifications:
+#  webhooks: https://galaxy.ansible.com/api/v1/notifications/

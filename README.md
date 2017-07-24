@@ -1,6 +1,8 @@
 dnsmasq
 =========
 
+[![Build Status](https://travis-ci.org/gorbyo/ansible-dnsmasq.svg?branch=master)](https://travis-ci.org/gorbyo/ansible-dnsmasq)
+
 The Role should help setup dnsmasq service as local resolver (without dhcp feature)
 
 Requirements

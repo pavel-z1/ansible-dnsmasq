@@ -7,10 +7,10 @@ root_dns:
   - 8.8.8.8
   - 8.8.4.4
 
-local_dns: []
+#local_dns: []
   # - { domain: zone1.domain1, ip: "192.168.1.1" }
   # - { domain: zone2.domain2, ip: "192.168.2.1" }
 
-local_hosts: []
+#local_hosts: []
   # - { hostname: host1.zone1.domain1, ip: "192.168.1.1" }
   # - { hostname: host2.zone2.domain2, ip: "192.168.2.1" }
