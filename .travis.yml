@@ -7,7 +7,6 @@ services:
 
 env:
   - OS_VERSION=7
-#  - OS_VERSION=6
 
 before_install:
   - sudo docker pull centos:${OS_VERSION}
@@ -15,11 +14,7 @@ before_install:
 
 install:
   - sudo docker run --detach --privileged --volume="${PWD}":/etc/ansible/roles/dnsmasq:ro --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro travispoc /usr/lib/systemd/systemd > /tmp/container_id
-  # --name centos-${OS_VERSION} centos:${OS_VERSION} sleep 300
-#  - sudo docker exec "$(cat /tmp/container_id)" yum -y install epel-release
-  - sudo docker exec "$(cat /tmp/container_id)" yum -y install NetworkManager
   - sudo docker exec "$(cat /tmp/container_id)" yum -y install dnsmasq
-#  - sudo docker exec "$(cat /tmp/container_id)" yum -y install ansible
 
 script:
   # Check syntax of ansible playbook
