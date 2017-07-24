@@ -1,35 +1,30 @@
 ---
 language: python
-python: "2.7"
+sudo: required
+
+services:
+  - docker
 
 env:
-  - distro: centos7
+  - OS_VERSION=7
+  - OS_VERSION=6
 
 before_install:
-  - sudo yum update -y
+  - sudo docker pull centos:${OS_VERSION}
 
 install:
-  # Install Ansible.
-  - pip install ansible
-
-  # Add ansible.cfg to pick up roles path.
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/dnsmasq:ro --name centos-${OS_VERSION} centos:${OS_VERSION} sleep 300
+  - sudo docker exec centos-${OS_VERSION} yum -y install epel-release
+  - sudo docker exec centos-${OS_VERSION} yum -y install ansible
 
 script:
-  # Check the role/playbook's syntax.
-  - "ansible-playbook -i tests/inventory tests/$SITE --syntax-check"
+  # Check syntax of ansible playbook
+  - sudo docker exec centos-${OS_VERSION} ansible-playbook /etc/ansible/roles/dnsmasq/tests/test.yml --syntax-check
+  # Run ansible playbook
+  - sudo docker exec centos-${OS_VERSION} ansible-playbook /etc/ansible/roles/dnsmasq/tests/test.yml
 
-  # Run the role/playbook with ansible-playbook.
-  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
+after_script:
+  - sudo docker stop centos-${OS_VERSION}
 
-  # Travis CI's environment requires one _extra_ run for true idempotence :-/.
-  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
-
-  # Run the role/playbook again, checking to make sure it's idempotent.
-  - >
-    ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
-
- 
+#notifications:
+#  webhooks: https://galaxy.ansible.com/api/v1/notifications/
