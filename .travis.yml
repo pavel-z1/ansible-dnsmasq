@@ -21,6 +21,12 @@ script:
   - sudo docker exec "$(cat /tmp/container_id)" ansible-playbook /etc/ansible/roles/dnsmasq/tests/test.yml --syntax-check
   # Run ansible playbook
   - sudo docker exec "$(cat /tmp/container_id)" ansible-playbook /etc/ansible/roles/dnsmasq/tests/test.yml -vv
+  
+  # Make sure DnsMasq is running.
+  - >
+    dig centos.org | grep -q  '127.0.0.1' 
+    && (echo 'Status: pass' && exit 0)
+    || (echo 'Status: fail' && exit 1)
 
 after_script:
   - sudo docker stop "$(cat /tmp/container_id)"
