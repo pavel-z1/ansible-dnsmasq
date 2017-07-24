@@ -24,7 +24,7 @@ script:
   
   # Make sure DnsMasq is running.
   - >
-    dig centos.org | grep -q  '127.0.0.1' 
+    dig centos.org @127.0.0.1 | grep -q  '127.0.0.1'
     && (echo 'Status: pass' && exit 0)
     || (echo 'Status: fail' && exit 1)
 

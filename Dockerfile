@@ -12,7 +12,7 @@ rm -f /lib/systemd/system/basic.target.wants/*; \
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 # Install Ansible
 RUN yum -y install epel-release
-RUN yum -y install git ansible sudo NetworkManager
+RUN yum -y install git ansible sudo NetworkManager bind-utils
 RUN systemctl enable NetworkManager
 RUN yum clean all
 # Disable requiretty
