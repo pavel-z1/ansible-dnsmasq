@@ -13,7 +13,9 @@ neg-ttl=259200
 max-ttl=259200
 
 log-async=25
+{% if dnsmasq_log_query == True %}
 log-queries
+{% endif %}
 log-facility=/var/log/dnsmasq.log
 
 
