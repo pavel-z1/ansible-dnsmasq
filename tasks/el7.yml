@@ -16,17 +16,16 @@
     list:        NetworkManager
   register:      nm_result
 
-- name:          define temp var
-  set_fact:      nm_ver={{item.version}}
-  when:          item.yumstate == 'installed'
-  with_items:    "{{nm_result.results}}"
+- name:          Check NetworkManager version
+  set_fact:
+    nm_ver: "{{ nm_result.results|selectattr('yumstate','equalto','installed')|map(attribute='version')|list|first }}"
 
 - block:
     - name:      end play if nm old
       fail:
         msg:     "Please update system! NetworkManager is very old."
     - meta:      end_play
-  when:          (nm_ver < '1.4.0') or (nm_ver is undefined)
+  when:          (nm_ver is undefined) or (nm_ver is version_compare('1.4.0', operator='<', strict=True))
 
 - name:          check resolv.conf
   shell:         grep -q '127.0.0.1' /etc/resolv.conf
@@ -60,9 +59,9 @@
 
   - name:        manual method
     shell:       echo {{ipv4_method.stdout}}
-    notify:      add nameserver
+    notify:      add local nameserver
     when:        ipv4_method.stdout == 'manual'
-  when:          (localhost_dns|failed) and (nm_ver >= '1.4.0')
+  when:          localhost_dns is failed
 
 - name:       copy config logrotate
   copy:       src=dnsmasq.logrotate dest=/etc/logrotate.d/dnsmasq
