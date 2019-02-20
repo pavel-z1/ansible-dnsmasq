@@ -59,7 +59,7 @@
 
   - name:        manual method
     shell:       echo {{ipv4_method.stdout}}
-    notify:      add nameserver
+    notify:      add local nameserver
     when:        ipv4_method.stdout == 'manual'
   when:          localhost_dns is failed
 

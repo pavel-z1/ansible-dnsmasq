@@ -8,7 +8,7 @@
   notify:     apply iface changes
   listen:     add dns-options
 
-- name:       add nameserver
+- name:       add local nameserver
   shell:      nmcli connection modify uuid {{ mgmt_uuid.stdout }} ipv4.dns 127.0.0.1
   notify:     add root namservers
 
