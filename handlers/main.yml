@@ -18,7 +18,7 @@
   notify:     set dns-options
 
 - name:       set dns-options
-  shell:      nmcli connection modify uuid {{ mgmt_uuid.stdout }} +ipv4.dns-options "timeout:1"
+  shell:      nmcli connection modify uuid {{ mgmt_uuid.stdout }} ipv4.dns-options 'timeout:1'
   notify:     apply iface changes
   listen:     add dns-options
 
