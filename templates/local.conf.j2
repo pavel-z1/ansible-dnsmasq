@@ -9,8 +9,9 @@ all-servers
 #strict-order
 
 cache-size=2048
-neg-ttl=259200
-max-ttl=259200
+no-negcache
+#neg-ttl=259200
+max-ttl=345600
 
 log-async=25
 {% if dnsmasq_log_query == True %}
