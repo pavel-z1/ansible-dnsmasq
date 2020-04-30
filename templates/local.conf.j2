@@ -28,7 +28,11 @@ server={{root_dns_ip}}
 # Local DNS
 {% if local_dns is defined %}
 {% for local_dns_param in local_dns %}
+{% if local_dns_param.port is defined %}
+server=/{{local_dns_param.domain}}/{{local_dns_param.ip}}#{{local_dns_param.port}}
+{% else %}
 server=/{{local_dns_param.domain}}/{{local_dns_param.ip}}
+{% endif %}
 {% endfor %}
 {% endif %}
 
