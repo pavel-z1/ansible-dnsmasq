@@ -1,10 +1,9 @@
 ---
 - name:          install needed common packages
   yum:
-    name:        '{{ item }}'
+    name:        
+      - yum-utils
     state:       installed
-  with_items:
-    - yum-utils
 
 - name:          install dnsmasq with package manager
   package:
