@@ -27,10 +27,9 @@
   when:          (nm_ver is undefined) or (nm_ver is version_compare('1.4.0', operator='<', strict=True))
 
 - name:          check resolv.conf
-  shell:         grep -q '127.0.0.1' /etc/resolv.conf
+  shell:         grep -q '127.0.0.1' /etc/resolv.conf && echo "found" || echo "not found"
   register:      localhost_dns
-  ignore_errors: True
-  changed_when:  False
+  changed_when: localhost_dns.stdout == "not found"
 
 - name:          start service
   service:
@@ -60,7 +59,7 @@
     shell:       echo {{ipv4_method.stdout}}
     notify:      add local nameserver
     when:        ipv4_method.stdout == 'manual'
-  when:          localhost_dns is failed
+  when:          localhost_dns.stdout == "not found"
 
 - name:       copy config logrotate
   copy:       src=dnsmasq.logrotate dest=/etc/logrotate.d/dnsmasq
